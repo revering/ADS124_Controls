@@ -118,23 +118,18 @@ class ADS124:
 	   return
 
 	def ADS124_SetGPIOValue( self, gpio, value ): 
+	   if value!=0 and value!=1:
+	      print "Setting must be 1 or 0."
+	      return
+	   if value>3 or value<0:
+	      print "Pin must be in range 0 - 3."
+	      return 
 	   list = self.ADS124_ReadReg(0x10, 1) 
-	   if gpio == 1:
-	      if (list[0] % 2) == 1:
-	         if value == 0:
-	            list[0] = list[0] - 1
-	      else:
-	         if value == 1:
-	            list[0] = list[0] + 1   
-	   if gpio == 2:
-	      if (list[0] % 4) < 2 :
-	         if value == 1:
-	            list[0] = list[0] + 2
-	      else:
-	         if value == 0:
-	            list[0] = list[0] - 2
-
-	   self.ADS124_WriteReg(0x10, 1, list)
+	   pre = list[0] >> (gpio+1)
+	   pre = pre << (gpio+1)
+	   post = list[0]%(2**gpio)
+	   value *= 2**gpio
+	   self.ADS124_WriteReg(0x10, 1, [pre|value|post])
 	   return
 
 	def ADS124_SetPosInput( self, pin ):
