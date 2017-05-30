@@ -245,3 +245,14 @@ class ADS124:
 	   self.ADS124_WriteReg(0x6,1,[val])
 	   print "Exitation current set to ", cur, "micro Amps."
 	   return
+
+	def ADS124_ReadVolt( self ):
+	   data = self.ADS124_ReadData()
+	   voltage = (data[0]<<16)+(data[1]<<8)+data[2]
+	   vref = 2.5
+	   print voltage
+	   return voltage*vref/(2**23)
+
+	def ADS124_SystemOffCal( self ):
+	   ADS124_connection.ADS124_transfer(self.spi, [0x19])
+	   return
