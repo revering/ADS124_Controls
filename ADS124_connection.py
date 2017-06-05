@@ -11,6 +11,7 @@ def ADS124_connect () :
 	spi.open(0,0)
         spi.cshigh = False
 	spi.mode = 0b01
+	spi.max_speed_hz = 3814
 
 	return spi
 

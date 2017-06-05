@@ -250,7 +250,6 @@ class ADS124:
 	   data = self.ADS124_ReadData()
 	   voltage = (data[0]<<16)+(data[1]<<8)+data[2]
 	   vref = 2.5
-	   print voltage
 	   return voltage*vref/(2**23)
 
 	def ADS124_SystemOffCal( self ):
