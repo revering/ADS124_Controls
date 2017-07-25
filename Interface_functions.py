@@ -11,9 +11,9 @@ def stop(con):
    return
 
 def status(con):
-   print ("\nPositive input is {}".format(con.ADS124_GetPosInput())) 
-   print ("Negative input is {}".format(con.ADS124_GetNegInput()))
-   print ("Excitation Current Sourced from {}".format(con.ADS124_GetIDAC1()))
+   print("\nPositive input is {}".format(con.ADS124_GetPosInput())) 
+   print("Negative input is {}".format(con.ADS124_GetNegInput()))
+   print("Excitation Current Sourced from {}".format(con.ADS124_GetIDAC1()))
    exmag = con.ADS124_GetIDACMag()
    if exmag==1: exmag = 10
    elif exmag==2: exmag = 50
@@ -25,11 +25,17 @@ def status(con):
    elif exmag==8: exmag = 1500
    elif exmag==9: exmag = 2000
    else: exmag=0
-   print ("Excitation Current Magnitude is {} micro amps".format(exmag))
-   ref = con.ADS124_GetIntRef()
-
-   print ("Reference type is {}\n\n".format(con.ADS124_GetIntRef()))
-#   print ("Bias voltage is {} from pin {}".format(con.ADS124_GetVBiasLevel(),con.ADS124_GetVBias()))
+   print("Excitation Current Magnitude is {} micro amps".format(exmag))
+   refen = con.ADS124_GetIntRef()
+   if refen==0: refon = "off"
+   else refon = "on"
+   print("Internal reference is %s" %refon)
+   ref = con.ADS124_GetRefSelect()
+   if ref==2: reftype = "internal"
+   elif ref==1: reftype = "REFP1 and REFN1"
+   else: reftype = "REFP0 and REFN0"
+   print("Selected reference is %s\n\n" %reftype)
+#   print("Bias voltage is {} from pin {}".format(con.ADS124_GetVBiasLevel(),con.ADS124_GetVBias()))
    return
 
 def commands():
@@ -43,11 +49,12 @@ def commands():
    print "2  : Set negative input"
    print "3  : Set exitation current source"
    print "4  : Set exitation current magnitude"
-   print "5  : Set reference"
-   print "6  : Setup bias voltage"
-   print "7  : Read one sample"
-   print "8  : Setup multiple readout"
-   print "9  : Read multiple samples\n\n"
+   print "5  : Enable/disable internal reference"
+   print "6  : Select reference"
+   print "7  : Setup bias voltage"
+   print "8  : Read one sample"
+   print "9  : Setup multiple readout"
+   print "10  : Read multiple samples\n\n"
    return
 
 def SetPosIn(con):
@@ -117,6 +124,17 @@ def SetVRef(con):
    else: con.ADS124_EnableIntRef()   
    return
 
+def SwitchIntRef(con):
+   userin = raw_input("Enter 1 to switch internal reference on or 0 to switch off")
+   try:
+      val = int(userin)
+   except ValueError:
+      print "Input not recognized"
+      return
+   if val==1: con.ADS124_EnableIntRef()
+   elif val==0: con.ADS124_DisableIntRef()
+   else: print "Input must be one or zero\n"
+   return
 
 def SetVBias(con):
    readVbias(con)
@@ -220,7 +238,7 @@ def load(con):
             print("File %s not formatted as expected" %fname)
 	    return
          setting.append(regdata)
-      elif i==18: filename = line
+      elif i==18: filename = line.strip()
       elif i==19: 
          try:
             nsamples = int(line)

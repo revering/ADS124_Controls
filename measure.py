@@ -12,6 +12,7 @@ x.ADS124_SetNegInput(1)
 x.ADS124_SetIDAC1(4)
 x.ADS124_SetVBias(1,1)
 x.ADS124_EnableIntRef()
+x.ADS124_RefSelect(2)
 x.ADS124_Start()
 volts = []
 sum = 0.0

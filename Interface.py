@@ -23,15 +23,16 @@ while(not done):
    elif command == "2": f.SetNegIn(con)
    elif command == "3": f.SetExSc(con)
    elif command == "4": f.SetExMag(con)
-   elif command == "5": f.SetVRef(con)
-   elif command == "6": f.SetVBias(con)
-   elif command == "7": f.ReadSample(con)
-   elif command == "8": 
+   elif command == "5": f.SwitchIntRef(con)
+   elif command == "6": f.SetVRef(con)
+   elif command == "7": f.SetVBias(con)
+   elif command == "8": f.ReadSample(con)
+   elif command == "9": 
       settings = f.RSetup(con, filename, nsamples, delay)
       filename = settings[0]
       nsamples = settings[1]
       delay = settings[2]
-   elif command == "9": f.ReadSamples(con, filename, nsamples, delay)
+   elif command == "10": f.ReadSamples(con, filename, nsamples, delay)
    elif command == "c": f.commands()
    elif command == "s": f.status(con)
    elif command == "r": f.reset(con)

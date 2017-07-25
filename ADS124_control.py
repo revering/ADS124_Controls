@@ -97,7 +97,6 @@ class ADS124:
       """
       setting = self.ADS124_ReadReg(0x5,1)
       self.ADS124_WriteReg(0x5,1,[((setting[0]>>2)<<2)|2])
-      self.ADS124_RefSelect(2)
       return
 
    def ADS124_DisableIntRef(self):
