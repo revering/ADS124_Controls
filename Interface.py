@@ -18,18 +18,21 @@ while(not done):
       f.status(con)
       ready = True
    command = input('Enter a command: ')
-   if command == 0: done = True
-   elif command == 1: f.SetPosIn(con)
-   elif command == 2: f.SetNegIn(con)
-   elif command == 3: f.SetExSc(con)
-   elif command == 4: f.SetExMag(con)
-   elif command == 5: f.SetVRef(con)
-   elif command == 6: f.SetVBias(con)
-   elif command == 7: f.ReadSample(con)
-   elif command == 8: f.RSetup(con, filename, nsamples, delay)
-   elif command == 9: f.ReadSamples(con, filename, nsamples, delay)
+   if command == "0": done = True
+   elif command == "1": f.SetPosIn(con)
+   elif command == "2": f.SetNegIn(con)
+   elif command == "3": f.SetExSc(con)
+   elif command == "4": f.SetExMag(con)
+   elif command == "5": f.SetVRef(con)
+   elif command == "6": f.SetVBias(con)
+   elif command == "7": f.ReadSample(con)
+   elif command == "8": f.RSetup(con, filename, nsamples, delay)
+   elif command == "9": f.ReadSamples(con, filename, nsamples, delay)
    elif command == "c": f.commands()
    elif command == "s": f.status(con)
+   elif command == "r": f.reset(con)
+   elif command == "l": f.load(con)
+   elif command == "sv": f.save(con)
    else : print "Command not recognized"
 
 f.stop(con)

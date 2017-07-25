@@ -127,10 +127,8 @@ class ADS124:
       return (self.ADS124_ReadReg(0x5,1)[0]%16)>>2
  
    def ADS124_RegDump(self):
-      """Prints the current contents of all 18 registers"""
-      regs = self.ADS124_ReadReg(0,18)
-      print [hex(a) for a in regs]
-      return
+      """Returns the current contents of all 18 registers"""
+      return self.ADS124_ReadReg(0,18)
 
    def ADS124_SetGPIOType( self, gpio, IO ):
       """
@@ -194,7 +192,7 @@ class ADS124:
 
    def ADS124_GetPosInput(self):
       """Returns the current positive input of the ADC"""
-      return self.ADS124_ReadReg(0x2,1)[0]<<4
+      return self.ADS124_ReadReg(0x2,1)[0]>>4
 
    def ADS124_SetNegInput( self, pin ):
       """Selects the negative input to the ADC"""

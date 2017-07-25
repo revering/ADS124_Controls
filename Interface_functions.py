@@ -9,31 +9,47 @@ def stop(con):
    return
 
 def status(con):
-   print ("Positive Input is {}".format(con.ADS124_GetPosInput())) 
-   print ("Negative Input is {}".format(con.ADS124_GetNegInput()))
+   print ("Positive input is {}".format(con.ADS124_GetPosInput())) 
+   print ("Negative input is {}".format(con.ADS124_GetNegInput()))
    print ("Excitation Current Sourced from {}".format(con.ADS124_GetIDAC1()))
-   print ("Excitation Current Magnitude is {}".format(con.ADS124_GetIDACMag()))
+   exmag = con.ADS124_GetIDACMag()
+   if exmag==1: exmag = 10
+   elif exmag==2: exmag = 50
+   elif exmag==3: exmag = 100
+   elif exmag==4: exmag = 250
+   elif exmag==5: exmag = 500
+   elif exmag==6: exmag = 750
+   elif exmag==7: exmag = 1000
+   elif exmag==8: exmag = 1500
+   elif exmag==9: exmag = 2000
+   else: exmag=0
+   print ("Excitation Current Magnitude is {} micro amps".format(exmag))
+   ref = con.ADS124_GetIntRef()
+
    print ("Reference type is {}".format(con.ADS124_GetIntRef()))
 #   print ("Bias voltage is {} from pin {}".format(con.ADS124_GetVBiasLevel(),con.ADS124_GetVBias()))
    return
 
 def commands():
-   print "s : status"
-   print "c : List commands"
-   print "0 : Exit "
-   print "1 : Set positive input"
-   print "2 : Set negative input"
-   print "3 : Set exitation current source"
-   print "4 : Set exitation current magnitude"
-   print "5 : Set reference"
-   print "6 : Setup bias voltage"
-   print "7 : Read one sample"
-   print "8 : Setup multiple readout"
-   print "9 : Read multiple samples"
+   print "s  : Status"
+   print "c  : List commands"
+   print "r  : Reset"
+   print "l  : Load settings"
+   print "sv : Save settings"
+   print "0  : Exit "
+   print "1  : Set positive input"
+   print "2  : Set negative input"
+   print "3  : Set exitation current source"
+   print "4  : Set exitation current magnitude"
+   print "5  : Set reference"
+   print "6  : Setup bias voltage"
+   print "7  : Read one sample"
+   print "8  : Setup multiple readout"
+   print "9  : Read multiple samples"
    return
 
 def SetPosIn(con):
-   userin = input("Enter positive input pin assignment (0-12)\n")
+   userin = raw_input("Enter positive input pin assignment (0-12)\n")
    try:
       pin = int(userin)
    except ValueError:
@@ -46,7 +62,7 @@ def SetPosIn(con):
    return
 
 def SetNegIn(con):
-   userin = input("Enter negative input pin assignment (0-12)\n")
+   userin = raw_input("Enter negative input pin assignment (0-12)\n")
    try:
       pin = int(userin)
    except ValueError:
@@ -59,7 +75,7 @@ def SetNegIn(con):
    return
 
 def SetExSc(con):
-   userin = input("Enter excitation current pin (0-12)\n")
+   userin = raw_input("Enter excitation current pin (0-12)\n")
    try:
       pin = int(userin)
    except ValueError:
@@ -72,7 +88,7 @@ def SetExSc(con):
    return
      
 def SetExMag(con):
-   userin = input("Enter excitation current magnitude in micro amps (0-2000)\n")
+   userin = raw_input("Enter excitation current magnitude in micro amps (0-2000)\n")
    try:
       mag = int(userin)
    except ValueError:
@@ -85,7 +101,7 @@ def SetExMag(con):
    return
 
 def SetVRef(con):
-   userin = input("Enter reference voltage source (int for internal, or 0-1\n")
+   userin = raw_input("Enter reference voltage source (int for internal, or 0-1\n")
    if userin != "int":
       try:
          src = int(userin)
@@ -102,7 +118,7 @@ def SetVRef(con):
 
 def SetVBias(con):
    readVbias(con)
-   userin = input("Switch which pin? (0-6 or \"com\") \n")
+   userin = raw_input("Switch which pin? (0-6 or \"com\") \n")
    if userin!="com":
       try:
          pin = int(userin)
@@ -110,7 +126,7 @@ def SetVBias(con):
          print("Input not recognized")
          return	 
       if (pin<0)|(pin>6):
-         print("Current must be between 0 and 2000")
+         print("Pin must be 0-6 or \"com\"")
          return
    else: pin = 6
    pinval = con.ADS124_GetVBias(pin)	 
@@ -130,23 +146,23 @@ def ReadSample(con):
 
 def RSetup(con, filename, nsamples, delay):
    readSetup(con, filename, nsamples, delay)
-   userin = input("Enter command\n")
+   userin = raw_input("Enter command\n")
    try:
       mag = int(userin)
    except ValueError:
-      print("Input not recognized\n")
+      print("input not recognized\n")
       RSetup(con, filename, nsamples, delay)	 
-   if (userin<0)|(userin>4):
-      print("Input must be between 0 and 4\n")
+   if (mag<0)|(mag>4):
+      print("input must be between 0 and 4\n")
       RSetup(con, filename, nsamples, delay)
-   elif userin==1:
-      filename = input("Enter new filename\n")
+   elif mag==1:
+      filename = raw_input("Enter new filename\n")
       RSetup(con, filename, nsamples, delay)
-   elif userin==2:
-      nsamples = input("Enter number of samples to take\n")
+   elif mag==2:
+      nsamples = raw_input("Enter number of samples to take\n")
       RSetup(con, filename, nsamples, delay)
-   elif userin==3:
-      delay = input("Enter time delay between samples\n")
+   elif mag==3:
+      delay = raw_input("Enter time delay between samples\n")
       RSetup(con, filename, nsamples, delay)
    return
    
@@ -157,6 +173,51 @@ def readSetup(con, filename, nsamples, delay):
    return
 
 def ReadSamples(con, filename, nsamples, delay):
+   with open(filename, 'w') as f:
+      for i in range(0,nsamples):
+         f.write(con.ADS124_ReadVolt())
+	 time.sleep(delay)
    return 
+
+def reset(con):
+   con.ADS124_Reset()
+   return
+
+def load(con):
+   fname = raw_input("Enter a file to load")
+   try:
+      ifile = open(filename, 'r')
+   except IOError:
+      print("File %s not found." %filename)
+      return
+   setting = []
+   for line in ifile:
+      try:
+         regdata = int(line)
+      except ValueError:
+         print("File %s not formatted as expected" %fname)
+	 return
+      if (regdata<0)|(regdata>255):
+         print("File %s not formatted as expected" %fname)
+	 return
+      setting.append(regdata)
+   if setting.size() != 18:
+      print("File %s not formatted as expected. %d registers instead of 18." %(fname,setting.size()))
+      return
+   con.ADS124_WriteReg(0,18,setting)
+   return
+
+def save(con):
+   fname = raw_input("Enter filename")
+   try:
+      ofile = open(filename, 'w')
+   except IOError:
+      print("Unable to open file %s" %filename)
+      return
+   setting = con.ADS124_RegDump()
+   for i in range(0,setting.size()):
+      ofile.write("%d\n" %setting[i])
+   ofile.close()
+   return
 
 
