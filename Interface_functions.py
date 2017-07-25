@@ -1,7 +1,9 @@
 import ADS124_control
+import time
 
 def setup(con):
    con.ADS124_Setup()
+   con.ADS124_Start()
    return
 
 def stop(con):
@@ -9,7 +11,7 @@ def stop(con):
    return
 
 def status(con):
-   print ("Positive input is {}".format(con.ADS124_GetPosInput())) 
+   print ("\nPositive input is {}".format(con.ADS124_GetPosInput())) 
    print ("Negative input is {}".format(con.ADS124_GetNegInput()))
    print ("Excitation Current Sourced from {}".format(con.ADS124_GetIDAC1()))
    exmag = con.ADS124_GetIDACMag()
@@ -26,12 +28,12 @@ def status(con):
    print ("Excitation Current Magnitude is {} micro amps".format(exmag))
    ref = con.ADS124_GetIntRef()
 
-   print ("Reference type is {}".format(con.ADS124_GetIntRef()))
+   print ("Reference type is {}\n\n".format(con.ADS124_GetIntRef()))
 #   print ("Bias voltage is {} from pin {}".format(con.ADS124_GetVBiasLevel(),con.ADS124_GetVBias()))
    return
 
 def commands():
-   print "s  : Status"
+   print "\ns  : Status"
    print "c  : List commands"
    print "r  : Reset"
    print "l  : Load settings"
@@ -45,7 +47,7 @@ def commands():
    print "6  : Setup bias voltage"
    print "7  : Read one sample"
    print "8  : Setup multiple readout"
-   print "9  : Read multiple samples"
+   print "9  : Read multiple samples\n\n"
    return
 
 def SetPosIn(con):
@@ -139,9 +141,8 @@ def readVbias(con):
    return
 
 def ReadSample(con):
-   con.ADS124_Start()
    volt = con.ADS124_ReadVolt()
-   print("Voltage is %d." %volt)
+   print("Voltage is %f." %volt)
    return
 
 def RSetup(con, filename, nsamples, delay):
@@ -158,24 +159,37 @@ def RSetup(con, filename, nsamples, delay):
    elif mag==1:
       filename = raw_input("Enter new filename\n")
       RSetup(con, filename, nsamples, delay)
-   elif mag==2:
-      nsamples = raw_input("Enter number of samples to take\n")
+   elif mag==2:      
+      userin = raw_input("Enter number of samples to take\n")
+      try: 
+         samples = int(userin)
+         if samples>0: nsamples = samples
+         else: print("Number of samples must be greater than zero") 
+      except ValueError:
+         print("Input %s not recognized as a number" %userin)      
       RSetup(con, filename, nsamples, delay)
    elif mag==3:
-      delay = raw_input("Enter time delay between samples\n")
+      userin = raw_input("Enter time delay between samples in seconds\n")
+      try:
+          floatin = float(userin)
+          if floatin>0: delay = floatin
+          else: print("Delay must be greater than zero seconds")
+      except ValueError:
+          print("Input %s not recognized as a time" %userin)
       RSetup(con, filename, nsamples, delay)
-   return
+   return [filename, nsamples, delay]
    
 
 def readSetup(con, filename, nsamples, delay):
-   print("Filename = %s, Number of samples = %d, delay = %f" %(filename,nsamples,delay))
-   print("1: Change filename\n2: Change number of samples\n3: Change delay time\n4: Return")
+   print("\nFilename = %s, Number of samples = %d, delay = %f" %(filename,nsamples,delay))
+   print("1: Change filename\n2: Change number of samples\n3: Change delay time\n4: Return\n")
    return
 
 def ReadSamples(con, filename, nsamples, delay):
    with open(filename, 'w') as f:
       for i in range(0,nsamples):
-         f.write(con.ADS124_ReadVolt())
+         v = con.ADS124_ReadVolt()
+         f.write("%f " %v)
 	 time.sleep(delay)
    return 
 
@@ -184,39 +198,62 @@ def reset(con):
    return
 
 def load(con):
-   fname = raw_input("Enter a file to load")
+   fname = raw_input("Enter a file to load\n")
    try:
-      ifile = open(filename, 'r')
+      ifile = open(fname, 'r')
    except IOError:
-      print("File %s not found." %filename)
+      print("File %s not found." %fname)
       return
    setting = []
+   i = 0
+   delay = 0.1
+   filename = "default.txt"
+   nsamples = 100
    for line in ifile:
-      try:
-         regdata = int(line)
-      except ValueError:
-         print("File %s not formatted as expected" %fname)
-	 return
-      if (regdata<0)|(regdata>255):
-         print("File %s not formatted as expected" %fname)
-	 return
-      setting.append(regdata)
-   if setting.size() != 18:
-      print("File %s not formatted as expected. %d registers instead of 18." %(fname,setting.size()))
+      if i<18:
+         try:
+            regdata = int(line)
+         except ValueError:
+            print("File %s not formatted as expected" %fname)
+	    return
+         if (regdata<0)|(regdata>255):
+            print("File %s not formatted as expected" %fname)
+	    return
+         setting.append(regdata)
+      elif i==18: filename = line
+      elif i==19: 
+         try:
+            nsamples = int(line)
+         except ValueError:
+            print("File %s not formatted as expected" %fname)
+            return
+      elif i==20:
+         try:
+            delay = float(line)
+         except ValueError:
+            print("File %s not formatted as expected" %fname)
+            return
+      i = i+1
+   if len(setting) != 18:
+      print("File %s not formatted as expected. %d registers instead of 18." %(fname,len(setting)))
       return
    con.ADS124_WriteReg(0,18,setting)
-   return
+   return [filename, nsamples, delay]
 
-def save(con):
-   fname = raw_input("Enter filename")
+def save(con, datafname, nsamples, delay):
+   fname = raw_input("Enter filename\n")
    try:
-      ofile = open(filename, 'w')
+      ofile = open(fname, 'w')
    except IOError:
-      print("Unable to open file %s" %filename)
+      print("Unable to open file %s" %fname)
       return
-   setting = con.ADS124_RegDump()
-   for i in range(0,setting.size()):
-      ofile.write("%d\n" %setting[i])
+   setting = []
+   for i in range(0,18): setting.append(con.ADS124_ReadReg(i,1))
+   for i in range(0,len(setting)):
+      ofile.write("%d\n" %setting[i][0])
+   ofile.write("%s\n" %datafname)
+   ofile.write("%d\n" %nsamples)
+   ofile.write("%f" %delay)
    ofile.close()
    return
 
