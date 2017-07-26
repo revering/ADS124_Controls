@@ -28,7 +28,7 @@ def status(con):
    print("Excitation Current Magnitude is {} micro amps".format(exmag))
    refen = con.ADS124_GetIntRef()
    if refen==0: refon = "off"
-   else refon = "on"
+   else: refon = "on"
    print("Internal reference is %s" %refon)
    ref = con.ADS124_GetRefSelect()
    if ref==2: reftype = "internal"
@@ -110,7 +110,7 @@ def SetExMag(con):
    return
 
 def SetVRef(con):
-   userin = raw_input("Enter reference voltage source (int for internal, or 0-1\n")
+   userin = raw_input("Enter reference voltage source (int for internal, or 0-1)\n")
    if userin != "int":
       try:
          src = int(userin)
@@ -120,12 +120,15 @@ def SetVRef(con):
       if (src<0)|(src>1):
          print("Pin must be either 0 or 1")
          return
-      con.ADS124_RefSelect(ref)
-   else: con.ADS124_EnableIntRef()   
+      con.ADS124_RefSelect(src)
+   else: 
+      con.ADS124_EnableIntRef()  
+      con.ADS124_RefSelect(2)
+   print("") 
    return
 
 def SwitchIntRef(con):
-   userin = raw_input("Enter 1 to switch internal reference on or 0 to switch off")
+   userin = raw_input("Enter 1 to switch internal reference on or 0 to switch off\n")
    try:
       val = int(userin)
    except ValueError:
