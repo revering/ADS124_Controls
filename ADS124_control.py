@@ -10,24 +10,24 @@ class ADS124:
    Does not check if connection exists or is responding.
    
    """     	
-   def __init__(self):
-      self.spi = ADS124_connection.ADS124_connect()
+   def __init__(self, ADS124_connection):
+      self.connection = ADS124_connection
 
    def __del__(self):
-      ADS124_connection.ADS124_close( self.spi )
+      self.connection.ADS124_close()
 
    def ADS124_Start(self):
       """ Start analog to digital conversion in chip """
-      ADS124_connection.ADS124_transfer(self.spi,[0x8])   
+      self.connection.ADS124_transfer([0x8])   
       return
 
    def ADS124_Stop(self): 	
       """ Stop analog to digital conversion in chip """
-      ADS124_connection.ADS124_transfer(self.spi,[0xa])  
+      self.connection.ADS124_transfer([0xa])  
       return
 
    def ADS124_Reset(self):
-      ADS124_connection.ADS124_transfer(self.spi,[0x6]) 
+      self.connection.ADS124_transfer([0x6]) 
       return
 
    def ADS124_ReadData(self):
@@ -37,7 +37,7 @@ class ADS124:
       Request + readout cycle takes two bytes longer than direct 
       data read, but avoids any potential offset issues.
       """
-      list = ADS124_connection.ADS124_transfer(self.spi,[0x12, 0,0,0])
+      list = self.connection.ADS124_transfer([0x12, 0,0,0])
       return list[1:4]
 
    def ADS124_ReadReg( self, reg, n ):
@@ -48,7 +48,7 @@ class ADS124:
       while (i < n):
          to_send.append(0)
          i = i + 1
-         ADS124_connection.ADS124_transfer(self.spi,to_send)
+         self.connection.ADS124_transfer(to_send)
       return to_send[2:n+2]
 	
    def ADS124_RDD(self):
@@ -59,7 +59,7 @@ class ADS124:
       read default output stream of data. May see offset errors if not 
       careful with clock or commands given.
       """
-      list=ADS124_connection.ADS124_transfer(self.spi, [0,0,0])
+      list=self.connection.ADS124_transfer([0,0,0])
       return list
 
    def ADS124_WriteReg( self, reg , n, values ):
@@ -74,7 +74,7 @@ class ADS124:
       b = (0x40 | reg)
       list = [b, n-1]
       to_write = list + values
-      ADS124_connection.ADS124_transfer(self.spi,to_write)
+      self.connection.ADS124_transfer(to_write)
       return
 
    def ADS124_Setup(self):
@@ -378,7 +378,7 @@ class ADS124:
       return voltage*vref/(2**23)
 
    def ADS124_SystemOffCal(self):
-      ADS124_connection.ADS124_transfer(self.spi, [0x19])
+      self.connection.ADS124_transfer([0x19])
       return
 
 

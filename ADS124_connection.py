@@ -1,28 +1,17 @@
-import spidev
+from abc import ABCMeta, abstractmethod
 
-def ADS124_transfer ( spi, list ) :
+class ADS124_connection:
    """
-   Transfer data over spi connection.
+   Abstract base class for ADS124 connections.
 
-   Sends a list of bytes to the ADS124_S08 over spi, and returns the chips 
-   response during the message.
+   Must be re-implemented with the given methods to fit the desired connection type.
    """
-   spi.xfer(list)
-   return list
+   __metaclass__ = ABCMeta
 
-def ADS124_connect () :
-   """
-   Open an spi connection to the ADS124_S08. 
-   
-   Settings should be customized to desired use.
-   """
-   spi = spidev.SpiDev()
-   spi.open(0,0)
-   spi.cshigh = False
-   spi.mode = 0b01
-   spi.max_speed_hz = 3814
-   return spi
-
-def ADS124_close ( spi ):
-   spi.close()
-   return
+   @abstractmethod
+   def ADS124_transfer(self,list):
+      pass
+   def ADS124_connect(self):
+      pass
+   def ADS124_close(self):
+      pass

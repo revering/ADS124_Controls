@@ -1,7 +1,14 @@
+import ADS124_RPiBasic
 import ADS124_control
 import time
 
-x = ADS124_control.ADS124()
+"""
+Script which measures 100 samples over ten seconds, then reports the average and standard deviation.
+
+Better to use "read samples" in interface, as this lacks ability to easily change and save settings.
+"""
+con = ADS124_RPiBasic()
+x = ADS124_control.ADS124(con)
 
 #x.ADS124_RegDump()
 #x.ADS124_Setup()

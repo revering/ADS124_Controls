@@ -1,3 +1,4 @@
+import ADS124_RPiBasic
 import ADS124_control
 import time
 import Interface_functions as f
@@ -6,7 +7,8 @@ import Interface_functions as f
 
 done = False
 ready = False
-con = ADS124_control.ADS124()
+connection = ADS124_RPiBasic()
+con = ADS124_control.ADS124(connection)
 filename = "default.txt"
 nsamples = 100
 delay = 0.1
