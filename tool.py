@@ -1,14 +1,14 @@
 import ADS124_RPiBasic
-import ADS124_control
+import core 
 import time
-import Interface_functions as f
+import tool_functions as f
 
 """Script for interacting with the ADS124_S08 control chip"""
 
 done = False
 ready = False
-connection = ADS124_RPiBasic()
-con = ADS124_control.ADS124(connection)
+connection = ADS124_RPiBasic.ADS124_RPiBasic()
+con = core.ADS124(connection)
 filename = "default.txt"
 nsamples = 100
 delay = 0.1

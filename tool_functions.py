@@ -1,4 +1,4 @@
-import ADS124_control
+import core
 import time
 
 def setup(con):

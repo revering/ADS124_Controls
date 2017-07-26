@@ -1,5 +1,5 @@
 import ADS124_RPiBasic
-import ADS124_control
+import core 
 import time
 
 """
@@ -7,8 +7,8 @@ Script which measures 100 samples over ten seconds, then reports the average and
 
 Better to use "read samples" in interface, as this lacks ability to easily change and save settings.
 """
-con = ADS124_RPiBasic()
-x = ADS124_control.ADS124(con)
+con = ADS124_RPiBasic.ADS124_RPiBasic()
+x = core.ADS124(con)
 
 #x.ADS124_RegDump()
 #x.ADS124_Setup()

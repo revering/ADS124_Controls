@@ -1,7 +1,7 @@
-import ADS124_connection
+import core 
 import spidev
 
-class ADS124_RPiBasic(ADS124_connection):
+class ADS124_RPiBasic(core.ADS124_connection):
    """
    Implementation of ADS124_connection for a basic raspberry pi setup.
 
@@ -10,7 +10,7 @@ class ADS124_RPiBasic(ADS124_connection):
    """
 
    def __init__(self):
-      ADS124_connect()
+      self.ADS124_connect()
 
    def ADS124_transfer(self,list):
       """
