@@ -11,7 +11,7 @@ def stop(con):
    return
 
 def status(con):
-   print("\nPositive input is {}".format(con.ADS124_GetPosInput())) 
+   print("Positive input is {}".format(con.ADS124_GetPosInput())) 
    print("Negative input is {}".format(con.ADS124_GetNegInput()))
    print("Excitation Current Sourced from {}".format(con.ADS124_GetIDAC1()))
    exmag = con.ADS124_GetIDACMag()
@@ -34,16 +34,17 @@ def status(con):
    if ref==2: reftype = "internal"
    elif ref==1: reftype = "REFP1 and REFN1"
    else: reftype = "REFP0 and REFN0"
-   print("Selected reference is %s\n\n" %reftype)
+   print("Selected reference is %s" %reftype)
 #   print("Bias voltage is {} from pin {}".format(con.ADS124_GetVBiasLevel(),con.ADS124_GetVBias()))
    return
 
 def commands():
-   print "\ns  : Status"
+   print "s  : Status"
    print "c  : List commands"
    print "r  : Reset"
    print "l  : Load settings"
    print "sv : Save settings"
+   print "ch : Select channel"
    print "0  : Exit "
    print "1  : Set positive input"
    print "2  : Set negative input"
@@ -54,7 +55,7 @@ def commands():
    print "7  : Setup bias voltage"
    print "8  : Read one sample"
    print "9  : Setup multiple readout"
-   print "10  : Read multiple samples\n\n"
+   print "10  : Read multiple samples"
    return
 
 def SetPosIn(con):
@@ -141,24 +142,28 @@ def SwitchIntRef(con):
 
 def SetVBias(con):
    readVbias(con)
-   userin = raw_input("Switch which pin? (0-6 or \"com\") \n")
+   userin = raw_input("\nSwitch which pin? (0-6, \"com\", any other input to exit) \n")
    if userin!="com":
       try:
          pin = int(userin)
       except ValueError:
-         print("Input not recognized")
          return	 
       if (pin<0)|(pin>6):
-         print("Pin must be 0-6 or \"com\"")
          return
    else: pin = 6
    pinval = con.ADS124_GetVBias(pin)	 
    con.ADS124_SetVBias(pin, not pinval)
+   print ""
+   readVbias(con)
 
 def readVbias(con):
    for i in range(0,7):
       pinval = con.ADS124_GetVBias(i)
-      print("Pin %d set to %d" %(i,pinval))
+      if pinval == 1:
+         status = "on"
+      else:
+         status = "off"
+      print("Pin %d VBias is %s" %(i,status))
    return
 
 def ReadSample(con):
@@ -277,5 +282,15 @@ def save(con, datafname, nsamples, delay):
    ofile.write("%f" %delay)
    ofile.close()
    return
+
+def SetChannel(con, num):
+   num -= 1
+   con.ADS124_SetNegInput(12)
+   while num>7:
+      num = num-8
+   con.ADS124_SetPosInput(7-num)
+   con.ADS124_SetIDAC1(7-num)
+   return
+ 
 
 
