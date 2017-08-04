@@ -221,6 +221,7 @@ def ReadSamples(con, filename, nsamples, delay):
 
 def reset(con):
    con.ADS124_Reset()
+   con.ADS124_Start()
    return
 
 def load(con):
