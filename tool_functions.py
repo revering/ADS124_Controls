@@ -293,5 +293,12 @@ def SetChannel(con, num):
    con.ADS124_SetIDAC1(7-num)
    return
  
+def ReadAll(con):
+   for i in range(1,9):
+      SetChannel(con,i)
+      time.sleep(0.1)
+      v = con.ADS124_ReadVolt()
+      print("AIN%d is at %f volts." %(8-i,v))
 
+   return 
 

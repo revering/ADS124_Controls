@@ -57,7 +57,8 @@ while(not done):
             else:
                print "RTD entered must be an integer from 1 to 24"
          except ValueError:
-            print("RTD entered must be an integer from 1 to 24")      
+            print("RTD entered must be an integer from 1 to 24")     
+      elif command == "t": f.ReadAll(con)
       else : print "Command not recognized"
    except KeyboardInterrupt:
       print "\nClosing"
