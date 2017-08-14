@@ -306,21 +306,21 @@ def ReadAllRepeat(con):
    inputs = []
    nsamples = 50
    for i in range(8):
-      inputs.append([],0,0)
+      inputs.append([[],0,0])
    for i in range(nsamples):
       for j in range(8):
          SetChannel(con,j+1)
 	 time.sleep(0.1)
 	 v = con.ADS124_ReadVolt()
 	 inputs[j][0].append(v)
-	 inputs[j][1] += v
-   for i in range(8):
+	 inputs[j][1] = inputs[j][1]+v
+   for j in range(8):
       inputs[j][1]/=nsamples
       for n in inputs[j][0]:
          inputs[j][2]+=((n-inputs[j][1])**2)
       inputs[j][2]/=nsamples-1
       inputs[j][2]=inputs[j][2]**0.5
-      print ("AIN%d is at %f +- %f volts." %(7-i, inputs[j][1], inputs[j][2]))
+      print ("AIN%d is at %f +- %f volts." %(7-j, inputs[j][1], inputs[j][2]))
    return
 
 
