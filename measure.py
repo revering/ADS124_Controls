@@ -5,7 +5,7 @@ import time
 """
 Script which measures 100 samples over ten seconds, then reports the average and standard deviation.
 
-Better to use "read samples" in interface, as this lacks ability to easily change and save settings.
+Better to use "read samples" in tool, as this lacks ability to easily change and save settings.
 """
 con = ADS124_RPiBasic.ADS124_RPiBasic()
 x = core.ADS124(con)
