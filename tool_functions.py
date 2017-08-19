@@ -323,15 +323,57 @@ def ReadAllRepeat(con):
       print ("AIN%d is at %f +- %f volts." %(7-j, inputs[j][1], inputs[j][2]))
    return
 
+def GPIO(con):
+   ShowGPIO(con)
+   userin = raw_input("Enter command\n")
+   try:
+      mag = int(userin)
+      if (mag<0)|(mag>3):
+         print("Input must be between 0 and 3\n")
+         GPIO(con)
+         elif mag==1:
+            pinin = raw_input("Enter GPIO to setup\n")
+         valin = raw_input("Enter new GPIO setting (1 for GPIO, 0 for input)\n")
+         try: 
+            pin = int(pinin)
+            val = int(valin)
+            if (pin<0)|(pin>3):
+               print("Pin not valid")
+            elif (val<0)|(val>1):
+               print("Setting must be zero or one.")
+            else: 
+               con.ADS124_SetGPIOType(pin,val)
+         except ValueError:
+            print("Input not recognized")
+         GPIO(con)
+      elif mag==2:      
+         userin = raw_input("Enter GPIO to change\n")
+         valin = raw_input("Enter new value (0 for off, 1 for on)\n")
+         try: 
+            pin = int(userin)
+            val = int(userin)
+            if (pin<0)|(pin>3):
+               print("Pin not valid")
+            elif (val<0)|(val>1):
+               print("Setting must be zero or one.")
+            else: 
+               con.ADS124_SetGPIOValue(pin,val)
+         except ValueError:
+            print("Input not recognized")      
+         GPIO(con)
+   except ValueError:
+      print("\nInput not recognized")
+      GPIO(con)
+   return  
 
-
-
-
-
-
-
-
-
-
+def ShowGPIO(con):
+   for i in range(0,4):
+      gpio = con.ADS124_GetGPIOType(i)
+      if gpio == 1:
+         print("GPIO %d is set as a GPIO, set to %d" %(i,con.ADS124_GetGPIOValue(i)))
+      else:
+         print("GPIO %d is set as an input." %(i)) 
+   print("\n1: Change GPIO Type\n2: Change GPIO Value\n3: Return\n")
+   return
 
 

@@ -60,6 +60,7 @@ while(not done):
             print("RTD entered must be an integer from 1 to 24")     
       elif command == "t": f.ReadAll(con)
       elif command == "tr" : f.ReadAllRepeat(con)
+      elif command == "g" : f.GPIO(con)
       else : print "Command not recognized"
    except KeyboardInterrupt:
       print "\nClosing"

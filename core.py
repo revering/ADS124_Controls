@@ -101,8 +101,8 @@ class ADS124:
       self.ADS124_Reset()
       self.ADS124_SetIDACMag(1000)
       self.ADS124_EnableIntRef()
-      self.ADS124_SetGPIOType(0,"GPIO")
-      self.ADS124_SetGPIOType(1,"GPIO")
+      self.ADS124_SetGPIOType(0,1)
+      self.ADS124_SetGPIOType(1,1)
       self.ADS124_DisableGain()
       return
 
@@ -165,15 +165,8 @@ class ADS124:
          post = setting[0] % (2**gpio)
       else: 
          post = 0
-      if IO == 'Input':
-         val = 0
-      elif IO == 'GPIO':
-         val = 1   
-      else:
-         print "Specify IO as \'Input\' or \'GPIO\'"
-         return
-      val *= 2**gpio
-      self.ADS124_WriteReg(0x11,1,[(pre|val|post)])
+      IO *= 2**gpio
+      self.ADS124_WriteReg(0x11,1,[(pre|IO|post)])
       return
 
    def ADS124_GetGPIOType(self, gpio):
