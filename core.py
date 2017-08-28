@@ -11,7 +11,7 @@ class ADS124_connection:
 
    @abstractmethod
 
-   def ADS124_transfer(self,list):
+   def ADS124_transfer(self,data):
       pass
 
    def ADS124_connect(self):
@@ -56,8 +56,8 @@ class ADS124:
       Request + readout cycle takes two bytes longer than direct 
       data read, but avoids any potential offset issues.
       """
-      list = self.connection.ADS124_transfer([0x12, 0,0,0])
-      return list[1:4]
+      data = self.connection.ADS124_transfer([0x12, 0,0,0])
+      return data[1:4]
 
    def ADS124_ReadReg( self, reg, n ):
       """ Read n bytes starting at register reg """
@@ -78,8 +78,8 @@ class ADS124:
       read default output stream of data. May see offset errors if not 
       careful with clock or commands given.
       """
-      list=self.connection.ADS124_transfer([0,0,0])
-      return list
+      data=self.connection.ADS124_transfer([0,0,0])
+      return data
 
    def ADS124_WriteReg( self, reg , n, values ):
       """ 
@@ -91,8 +91,8 @@ class ADS124:
       Values - A list of n bytes.
       """
       b = (0x40 | reg)
-      list = [b, n-1]
-      to_write = list + values
+      data = [b, n-1]
+      to_write = data + values
       self.connection.ADS124_transfer(to_write)
       return
 
@@ -181,10 +181,10 @@ class ADS124:
       if value>3 or value<0:
          print "Pin must be in range 0 - 3."
          return 
-      list = self.ADS124_ReadReg(0x10, 1) 
-      pre = list[0] >> (gpio+1)
+      data = self.ADS124_ReadReg(0x10, 1) 
+      pre = data[0] >> (gpio+1)
       pre = pre << (gpio+1)
-      post = list[0]%(2**gpio)
+      post = data[0]%(2**gpio)
       value *= 2**gpio
       self.ADS124_WriteReg(0x10, 1, [pre|value|post])
       return

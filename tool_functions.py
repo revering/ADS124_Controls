@@ -331,8 +331,8 @@ def GPIO(con):
       if (mag<0)|(mag>3):
          print("Input must be between 0 and 3\n")
          GPIO(con)
-         elif mag==1:
-            pinin = raw_input("Enter GPIO to setup\n")
+      elif mag==1:
+         pinin = raw_input("Enter GPIO to setup\n")
          valin = raw_input("Enter new GPIO setting (1 for GPIO, 0 for input)\n")
          try: 
             pin = int(pinin)
@@ -351,7 +351,7 @@ def GPIO(con):
          valin = raw_input("Enter new value (0 for off, 1 for on)\n")
          try: 
             pin = int(userin)
-            val = int(userin)
+            val = int(valin)
             if (pin<0)|(pin>3):
                print("Pin not valid")
             elif (val<0)|(val>1):
