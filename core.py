@@ -63,11 +63,9 @@ class ADS124:
       """ Read n bytes starting at register reg """
       b = ( 0x20 | reg )
       to_send = [b, n-1]
-      i = int(0) 
-      while (i < n):
+      for i in range(0,n):   
          to_send.append(0)
-         i = i + 1
-         self.connection.ADS124_transfer(to_send)
+      self.connection.ADS124_transfer(to_send)
       return to_send[2:n+2]
 	
    def ADS124_RDD(self):
