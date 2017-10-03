@@ -19,7 +19,7 @@ class ADS124_RPiBasic(core.ADS124_connection):
       Sends a list of bytes to the ADS124_S08 over spi, and returns the chips 
       response during the message.
       """
-      self.spi.xfer(list)
+      self.spi.xfer2(list)
       return list
 
    def ADS124_connect(self) :

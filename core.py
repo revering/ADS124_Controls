@@ -65,8 +65,8 @@ class ADS124:
       to_send = [b, n-1]
       for i in range(0,n):   
          to_send.append(0)
-      self.connection.ADS124_transfer(to_send)
-      return to_send[2:n+2]
+      data = self.connection.ADS124_transfer(to_send)
+      return data[2:n+2]
 	
    def ADS124_RDD(self):
       """ 
@@ -390,5 +390,52 @@ class ADS124:
    def ADS124_SystemOffCal(self):
       self.connection.ADS124_transfer([0x19])
       return
+
+class EEPROM:
+   """Class for creating commands for the 25AA02E48 EEPROM
+   
+   Needs ADS124_connect(), ADS124_close(), and ADS124_transfer methods to exist.
+   ADS124_connect() must return an spi connection object, ADS124_transfer() 
+   must write and simultaneously recieve the number of bytes given.
+   Does not check if connection exists or is responding.
+   
+   """     	
+   def __init__(self, ADS124_connection):
+      self.connection = ADS124_connection
+
+   def __del__(self):
+      self.connection.ADS124_close()
+
+   def ReadReg(self, reg):
+      to_send = [0x3,reg,0]
+      self.connection.ADS124_transfer(to_send)
+      return to_send[2]
+
+   def WriteReg(self, reg, data):
+      to_send = [0x2,reg,data]
+      self.connection.ADS124_transfer(to_send)
+      return
+ 
+   def WriteEnable(self):
+      self.connection.ADS124_transfer([0x6])
+      return
+  
+   def WriteDisable(self):
+      self.connection.ADS124_transfer([0x4])
+      return
+
+   def ReadStatus(self):
+      data = [0x5,0]
+      self.connection.ADS124_transfer(data)
+      return data[1]
+
+   def WriteStatusReg(self, data):
+      to_write = [0x1,data]
+      self.connection.ADS124_transfer(to_write)
+      return
+
+   
+
+ 
 
 
