@@ -2,13 +2,17 @@ import ADS124_RPiBasic
 import core 
 import time
 import tool_functions as f
-
+import EEPROM
 """Script for interacting with the ADS124_S08 control chip"""
 
 done = False
 ready = False
 connection = ADS124_RPiBasic.ADS124_RPiBasic()
 con = core.ADS124(connection)
+
+ECON = EEPROM.EEPROM_RPiBasic()
+econ = core.EEPROM(ECON)
+
 filename = "default.txt"
 nsamples = 100
 delay = 0.1
@@ -59,8 +63,9 @@ while(not done):
          except ValueError:
             print("RTD entered must be an integer from 1 to 24")     
       elif command == "t": f.ReadAll(con)
-      elif command == "tr" : f.ReadAllRepeat(con)
+      elif command == "tr" : f.ReadAllRepeat(con,econ)
       elif command == "g" : f.GPIO(con)
+      elif command == "EEPROM": f.EEPromMem(econ)
       else : print "Command not recognized"
    except KeyboardInterrupt:
       print "\nClosing"

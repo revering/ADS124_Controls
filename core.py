@@ -425,6 +425,21 @@ class EEPROM:
    def __del__(self):
       self.connection.EEPROM_close()
 
+   def LabelId(self):
+      label=""
+      for i in range(16):
+         x=self.ReadReg(i)
+         if x==0:
+            break
+         label=label+chr(x)
+      return label
+
+   def SerialId(self):
+      sid=[]
+      for i in range(5):
+         sid.append(self.ReadReg(i+0xf8+3))
+      return sid      
+
    def ReadReg(self, reg):
       to_send = [0x3,reg,0]
       self.connection.EEPROM_transfer(to_send)
