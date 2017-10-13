@@ -12,15 +12,15 @@ class ADS124_RPiBasic(core.ADS124_connection):
    def __init__(self):
       self.ADS124_connect()
 
-   def ADS124_transfer(self,list):
+   def ADS124_transfer(self,to_send):
       """
       Transfer data over spi connection.
 
-      Sends a list of bytes to the ADS124_S08 over spi, and returns the chips 
+      Sends a list of bytes to the ADS124_S08 over spi, and returns the chip's 
       response during the message.
       """
-      self.spi.xfer2(list)
-      return list
+      data = self.spi.xfer2(to_send)
+      return data
 
    def ADS124_connect(self) :
       """
