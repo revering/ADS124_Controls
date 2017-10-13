@@ -56,6 +56,8 @@ def commands():
    print "8  : Read one sample"
    print "9  : Setup multiple readout"
    print "10  : Read multiple samples"
+   print "tr   : Reads all samples temps multiple times and stores to file"
+   print "EEPROM : Opens EEProm menu for reading and writing"
    return
 
 def SetPosIn(con):
@@ -139,6 +141,15 @@ def SwitchIntRef(con):
    elif val==0: con.ADS124_DisableIntRef()
    else: print "Input must be one or zero\n"
    return
+
+
+
+def ReadEEPromOptions():
+   print "1: Read Printed ID number"
+   print "2: Read Serial Number"
+   print "3: Write Printed ID number"
+   print "4: exits the menu"
+
 
 def SetVBias(con):
    readVbias(con)
@@ -302,25 +313,61 @@ def ReadAll(con):
 
    return 
 
-def ReadAllRepeat(con):
+def EEPromMem(econ):
+   ReadEEPromOptions()
+   userin = raw_input("\n")
+   try:
+      Input = int(userin)
+   
+      if Input==1:
+         print "The id written on the board is: "+econ.LabelId()
+      elif Input==2:
+         sn=econ.SerialId()
+         print "The Serial number is: %02x:%02x:%02x:%02x:%02x"%(sn[0],sn[1],sn[2],sn[3],sn[4])
+      elif Input==3:
+         idstr = str(raw_input("Label from the circuit board (starts with DI) "))
+         for i in range(16):
+            if i<len(idstr):
+              x=ord(idstr[i])
+            else: x=0
+            econ.WriteEnable()
+            econ.WriteReg(i,x)
+            time.sleep(0.1)
+      elif Input==4:
+         return
+      EEPromMem(econ)
+   except ValueError:
+      return
+
+def ReadAllRepeat(con, econ):
    inputs = []
    nsamples = 50
-   for i in range(8):
-      inputs.append([[],0,0])
-   for i in range(nsamples):
+   print "The id written on the board is: "+econ.LabelId()
+   sn=econ.SerialId()
+   print "The Serial Number is : %02x:%02x:%02x:%02x:%02x"%(sn[0],sn[1],sn[2],sn[3],sn[4])
+   SerialString = (str(sn[0])+str(sn[1])+str(sn[2])+str(sn[3])+str(sn[4]))
+   FileName ="TempsForWId_"+econ.LabelId()+"_SN_"+SerialString.strip()+".txt"
+   print repr(FileName)
+   with open(FileName.strip(),"w") as f:
+      f.write("The id written on the board is: "+econ.LabelId()+"\n")
+      f.write("The Serial Number is : %02x:%02x:%02x:%02x:%02x\n"%(sn[0],sn[1],sn[2],sn[3],sn[4]))
+      for i in range(8):
+         inputs.append([[],0,0])
+      for i in range(nsamples):
+         for j in range(8):
+            SetChannel(con,j+1)
+            time.sleep(0.1)
+            v = con.ADS124_ReadVolt()
+            inputs[j][0].append(v)
+            inputs[j][1] = inputs[j][1]+v
       for j in range(8):
-         SetChannel(con,j+1)
-	 time.sleep(0.1)
-	 v = con.ADS124_ReadVolt()
-	 inputs[j][0].append(v)
-	 inputs[j][1] = inputs[j][1]+v
-   for j in range(8):
-      inputs[j][1]/=nsamples
-      for n in inputs[j][0]:
-         inputs[j][2]+=((n-inputs[j][1])**2)
-      inputs[j][2]/=nsamples-1
-      inputs[j][2]=inputs[j][2]**0.5
-      print ("AIN%d is at %f +- %f volts." %(7-j, inputs[j][1], inputs[j][2]))
+         inputs[j][1]/=nsamples
+         for n in inputs[j][0]:
+            inputs[j][2]+=((n-inputs[j][1])**2)
+         inputs[j][2]/=nsamples-1
+         inputs[j][2]=inputs[j][2]**0.5
+         print ("AIN%d is at %f +- %f volts." %(7-j, inputs[j][1], inputs[j][2]))
+         f.write("AIN%d is at %f +- %f volts.\n" %(7-j, inputs[j][1], inputs[j][2]))
    return
 
 def GPIO(con):

@@ -391,6 +391,25 @@ class ADS124:
       self.connection.ADS124_transfer([0x19])
       return
 
+class EEPROM_connection:
+   """
+   Abstract base class for ADS124 connections.
+
+   Must be re-implemented with the given methods to fit the desired connection type.
+   """
+   __metaclass__ = ABCMeta
+
+   @abstractmethod
+
+   def EEPROM_transfer(self,data):
+      pass
+
+   def EEPROM_connect(self):
+      pass
+
+   def EEPROM_close(self):
+      pass
+
 class EEPROM:
    """Class for creating commands for the 25AA02E48 EEPROM
    
@@ -400,38 +419,53 @@ class EEPROM:
    Does not check if connection exists or is responding.
    
    """     	
-   def __init__(self, ADS124_connection):
-      self.connection = ADS124_connection
+   def __init__(self, EEPROM_connection):
+      self.connection = EEPROM_connection
 
    def __del__(self):
-      self.connection.ADS124_close()
+      self.connection.EEPROM_close()
+
+   def LabelId(self):
+      label=""
+      for i in range(16):
+         x=self.ReadReg(i)
+         if x==0:
+            break
+         label=label+chr(x)
+      return label
+
+   def SerialId(self):
+      sid=[]
+      for i in range(5):
+         sid.append(self.ReadReg(i+0xf8+3))
+      return sid      
 
    def ReadReg(self, reg):
       to_send = [0x3,reg,0]
-      self.connection.ADS124_transfer(to_send)
+      self.connection.EEPROM_transfer(to_send)
       return to_send[2]
 
    def WriteReg(self, reg, data):
       to_send = [0x2,reg,data]
-      self.connection.ADS124_transfer(to_send)
+      self.connection.EEPROM_transfer(to_send)
       return
  
    def WriteEnable(self):
-      self.connection.ADS124_transfer([0x6])
+      self.connection.EEPROM_transfer([0x6])
       return
   
    def WriteDisable(self):
-      self.connection.ADS124_transfer([0x4])
+      self.connection.EEPROM_transfer([0x4])
       return
 
    def ReadStatus(self):
       data = [0x5,0]
-      self.connection.ADS124_transfer(data)
+      self.connection.EEPROM_transfer(data)
       return data[1]
 
    def WriteStatusReg(self, data):
       to_write = [0x1,data]
-      self.connection.ADS124_transfer(to_write)
+      self.connection.EEPROM_transfer(to_write)
       return
 
    
